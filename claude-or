@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# Claude Code 启动脚本
+# 用法:
+#   claude-or                        # 使用默认模式（本地优先，本地不可用则走 DMXAPI）
+#   claude-or --local                # 强制使用本地模型
+#   claude-or --remote               # 强制使用 DMXAPI
+#   claude-or -p "问题"              # 非交互模式
+#   claude-or --model claude-3-7-sonnet-20250219   # 指定模型
+
+BUN=~/.bun/bin/bun
+CLI=/Users/huangyiming/Desktop/code/claude_code_src-master/dist/cli.cjs
+
+# ── 配置区 ───────────────────────────────────────────────
+# 本地模型服务（LiteLLM / Ollama 等，需暴露 Anthropic 兼容接口）
+LOCAL_BASE_URL="http://localhost:4000"   # LiteLLM 默认端口
+LOCAL_MODEL="deepseek-v3"               # litellm-config.yaml 中定义的模型名
+LOCAL_API_KEY="dummy"                    # LiteLLM 本地不校验 key
+
+# 远程 AnyRouter（支持 Anthropic 原生格式，国内可用）
+# 注意：SDK 会自动追加 /v1/messages，所以 base URL 不能带 /v1
+REMOTE_BASE_URL="https://anyrouter.top"
+REMOTE_MODEL="claude-haiku-4-5-20251001"
+REMOTE_API_KEY="your-api-key-here"
+# ─────────────────────────────────────────────────────────
+
+MODE="auto"
+EXTRA_ARGS=()
+
+# 解析 --local / --remote 标志
+for arg in "$@"; do
+  case "$arg" in
+    --local)  MODE="local"  ;;
+    --remote) MODE="remote" ;;
+    *)        EXTRA_ARGS+=("$arg") ;;
+  esac
+done
+
+# auto 模式：检测本地服务是否在线
+if [ "$MODE" = "auto" ]; then
+  if curl -sf --max-time 2 "$LOCAL_BASE_URL/health" > /dev/null 2>&1 || \
+     curl -sf --max-time 2 "$LOCAL_BASE_URL/v1/models" > /dev/null 2>&1; then
+    MODE="local"
+    echo "[UniCode] 检测到本地模型服务，使用 $LOCAL_BASE_URL" >&2
+  else
+    MODE="remote"
+    echo "[UniCode] 使用远程服务: $REMOTE_BASE_URL" >&2
+  fi
+fi
+
+if [ "$MODE" = "local" ]; then
+  export ANTHROPIC_BASE_URL="$LOCAL_BASE_URL"
+  export ANTHROPIC_API_KEY="$LOCAL_API_KEY"
+  DEFAULT_MODEL="$LOCAL_MODEL"
+else
+  export ANTHROPIC_BASE_URL="$REMOTE_BASE_URL"
+  export ANTHROPIC_API_KEY="$REMOTE_API_KEY"
+  DEFAULT_MODEL="$REMOTE_MODEL"
+fi
+
+# 禁用 extended thinking（DMXAPI 返回 thinking 块会导致 TUI 卡住）
+export MAX_THINKING_TOKENS=0
+# 禁用语法高亮（color-diff-napi 原生模块在当前构建环境不可用）
+export CLAUDE_CODE_SYNTAX_HIGHLIGHT=0
+THINKING_ARGS=(--thinking disabled)
+
+# 如果用户没有指定 --model，则使用默认模型
+HAS_MODEL=false
+for arg in "${EXTRA_ARGS[@]}"; do
+  [ "$arg" = "--model" ] && HAS_MODEL=true && break
+done
+
+DEFAULT_ARGS=(--dangerously-skip-permissions "${THINKING_ARGS[@]}")
+if [ "$HAS_MODEL" = false ]; then
+  DEFAULT_ARGS+=(--model "$DEFAULT_MODEL")
+fi
+
+exec "$BUN" "$CLI" "${DEFAULT_ARGS[@]}" "${EXTRA_ARGS[@]}"

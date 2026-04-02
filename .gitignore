@@ -1,0 +1,20 @@
+# 构建产物
+dist/
+
+# 依赖
+node_modules/
+
+# 原始 npm 包（包含大文件和 source map）
+package/
+
+# 原始 tgz 包
+*.tgz
+
+# 系统文件
+.DS_Store
+
+# Claude 本地配置
+.claude/
+
+# vendor 二进制文件
+vendor/

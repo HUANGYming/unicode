@@ -1,0 +1,25 @@
+model_list:
+  # DeepSeek V3 - 便宜且编码能力强
+  - model_name: deepseek-v3
+    litellm_params:
+      model: openai/DMXAPI-DeepSeek-V3
+      api_base: https://www.dmxapi.com/v1
+      api_key: your-api-key-here
+
+  # Qwen3-32B - 性价比高
+  - model_name: qwen3-32b
+    litellm_params:
+      model: openai/qwen3-32b
+      api_base: https://www.dmxapi.com/v1
+      api_key: your-api-key-here
+
+  # Kimi K2 - 长上下文
+  - model_name: kimi-k2
+    litellm_params:
+      model: openai/Kimi-K2
+      api_base: https://www.dmxapi.com/v1
+      api_key: your-api-key-here
+
+litellm_settings:
+  drop_params: true        # 忽略 Anthropic 特有参数（thinking 等）
+  set_verbose: false

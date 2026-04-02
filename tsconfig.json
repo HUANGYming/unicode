@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "strict": false,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["./src/*"],
+      "audio-capture-napi": ["./vendor/audio-capture-src/index.ts"],
+      "modifiers-napi": ["./vendor/modifiers-napi-src/index.ts"],
+      "image-processor-napi": ["./vendor/image-processor-src/index.ts"],
+      "url-handler-napi": ["./vendor/url-handler-src/index.ts"]
+    },
+    "types": ["bun-types"]
+  },
+  "include": ["src/**/*", "vendor/**/*", "build.ts", "global.d.ts"]
+}
