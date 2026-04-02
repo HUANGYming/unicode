@@ -5,7 +5,6 @@
 **离线优先的 AI 编程助手 · 支持本地模型与国内外云端 API**
 
 [![Version](https://img.shields.io/badge/version-2.1.88-blue.svg)](https://github.com/HUANGYming/unicode)
-[![Based on](https://img.shields.io/badge/based_on-Claude_Code_2.1.88-orange.svg)](https://www.npmjs.com/package/@anthropic-ai/claude-code/v/2.1.88)
 [![License](https://img.shields.io/badge/license-research_only-red.svg)](#免责声明)
 
 [快速开始](#快速开始) · [本地离线部署](#本地离线部署) · [云端接入](#云端-api-提供商) · [构建说明](#构建说明)
@@ -16,12 +15,12 @@
 
 ## 是什么
 
-UniCode 是基于 Claude Code 2.1.88 源码重建的 AI 编程 CLI 工具。
+UniCode 是一款终端 AI 编程助手，支持交互式 TUI 和管道模式。
 
-与官方版本最大的不同：**你不需要 Anthropic 账号**，可以接入任何兼容的模型——无论是跑在本机的 Ollama，还是国内的 AnyRouter、DMXAPI，抑或海外的任何服务。
+最大特点：**无需注册任何账号**，可接入任何兼容的模型——无论是跑在本机的 Ollama，还是国内的 AnyRouter、DMXAPI，抑或海外的任何服务。
 
 ```
-unicde                  # 启动交互式对话
+unicode                  # 启动交互式对话
 unicode -p "帮我重构这段代码"  # 管道模式，输出结果后退出
 ```
 
@@ -34,8 +33,8 @@ unicode -p "帮我重构这段代码"  # 管道模式，输出结果后退出
 | **🖥️ 完全离线** | 接入本地 Ollama / vLLM，代码不出内网，适合企业保密场景 |
 | **🌐 国内可用** | 支持 AnyRouter、DMXAPI 等国内可直连的 API，无需科学上网 |
 | **🔀 自动切换** | 本地服务在线时优先走本地，不可用时自动切换云端 |
-| **⚡ 完整功能** | 文件读写、代码执行、Bash 工具、多轮对话，与原版体验一致 |
-| **🔑 只需 API Key** | 无需登录 Anthropic 账号，填入任意兼容服务的 key 即可 |
+| **⚡ 完整功能** | 文件读写、代码执行、Bash 工具、多轮对话 |
+| **🔑 只需 API Key** | 无需 OAuth 登录，填入任意兼容服务的 key 即可 |
 
 ---
 
@@ -105,7 +104,7 @@ unicode -p "你好"  # 快速提问
 # 安装 Ollama 并拉取模型
 ollama pull qwen2.5-coder:32b   # 推荐代码模型
 
-# 安装 LiteLLM（Anthropic 格式转换层）
+# 安装 LiteLLM（API 格式转换层）
 pip install litellm[proxy]
 
 # 启动 LiteLLM，监听 4000 端口
@@ -141,7 +140,7 @@ unicode --local   # 强制使用本地，不走云端
 
 ## 云端 API 提供商
 
-### Anthropic 原生格式（直接兼容，无需额外配置）
+### Anthropic Messages 格式（直接兼容，无需额外配置）
 
 | 提供商 | Base URL | 特点 |
 |--------|----------|------|
@@ -149,7 +148,7 @@ unicode --local   # 强制使用本地，不走云端
 | [DMXAPI](https://www.dmxapi.com) | `https://www.dmxapi.com` | 国内直连，按量计费 |
 | Anthropic 官方 | `https://api.anthropic.com` | 需要官方账号 |
 
-### OpenAI 格式（需 LiteLLM 中转，见上方配置）
+### OpenAI Chat 格式（需 LiteLLM 中转，见上方配置）
 
 | 提供商 | 推荐模型 | 特点 |
 |--------|----------|------|
@@ -174,7 +173,7 @@ unicode --dangerously-skip-permissions  # 跳过权限确认（自动化场景�
 
 ## 构建说明
 
-使用 esbuild 打包（原版 Bun bundle 在大型代码库上有 segfault 问题）。
+使用 esbuild 打包（Bun bundle 在大型代码库上有 segfault 问题）。
 
 ```
 构建工具：  esbuild（通过 Bun 调用）
@@ -185,21 +184,7 @@ Node.js：   18+
 
 `build.sh` 做了两件事：
 1. esbuild 打包整个 TypeScript 源码
-2. 运行时补丁：修复 `void runHeadless2()` 吞掉错误的问题
-
----
-
-## 与原版差异
-
-| | 原版 Claude Code | UniCode |
-|--|--|--|
-| API 提供商 | 仅 Anthropic | 任意兼容服务 |
-| 国内访问 | 需科学上网 | 直接可用 |
-| 离线使用 | 不支持 | 支持本地模型 |
-| 登录方式 | Anthropic OAuth | API Key |
-| Extended Thinking | 默认开启 | 默认关闭 |
-| 应用名称 | Claude Code | UniCode |
-| TUI 图案 | 小机器人 | 猫猫 🐱 |
+2. 运行时补丁：修复错误被静默吞掉的问题
 
 ---
 
@@ -207,7 +192,7 @@ Node.js：   18+
 
 ```
 .
-├── src/                    # 源码（基于 Claude Code 2.1.88 还原）
+├── src/                    # TypeScript 源码
 │   ├── components/         # React + Ink 终端 UI 组件
 │   ├── services/           # 核心业务逻辑（API、会话、工具调用）
 │   ├── tools/              # Bash、文件读写、搜索等工具实现
@@ -224,11 +209,10 @@ Node.js：   18+
 
 ## 免责声明
 
-本项目基于 Claude Code 2.1.88 npm 包附带的 source map 还原源码，仅供学习与研究。原始代码版权归 Anthropic 所有，本项目不代表 Anthropic 官方立场，不用于商业用途。
+本项目包含第三方软件代码，相关版权归原始版权持有人所有。本项目不代表任何原始版权持有人的官方立场，不用于商业用途，仅供个人学习与研究。
 
 ---
 
 ## 致谢
 
-- [Anthropic](https://anthropic.com) — Claude Code 原始工程
 - [ponponon/claude_code_src](https://github.com/ponponon/claude_code_src) — 源码还原工作
