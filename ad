@@ -1,0 +1,21 @@
+# 1. 安装必要工具
+sudo apt-get update
+sudo apt-get install -y curl gpg
+
+# 2. 删除可能配置错误的旧软件源
+sudo rm -f /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+# 3. 添加 NVIDIA GPG key
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+  | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+
+# 4. 添加 NVIDIA Container Toolkit 软件源
+curl -sL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+  | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+# 5. 更新软件包索引
+sudo apt-get update
+
+# 6. 安装
+sudo apt-get install -y nvidia-container-toolkit
