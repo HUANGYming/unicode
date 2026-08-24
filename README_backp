@@ -1,0 +1,33 @@
+docker run --rm -it \
+  --gpus all \
+  --network host \
+  --ipc host \
+  --shm-size 32g \
+  -e NCCL_SOCKET_IFNAME=enp1s0f1np1,enP2p1s0f1np1 \
+  -e NCCL_DEBUG=INFO \
+  -v /opt/llm/deep-ai/DeepSeek-V4-Flash-0731:/model \
+  lmsysorg/sglang:latest \
+  python3 -m sglang.launch_server \
+    --model-path /model \
+    --host 0.0.0.0 \
+    --port 30000 \
+    --tp-size 2 \
+    --nnodes 2 \
+    --node-rank 0 \
+    --dist-init-addr 10.100.72.2:5000
+
+docker run --rm -it \
+  --gpus all \
+  --network host \
+  --ipc host \
+  --shm-size 32g \
+  -e NCCL_SOCKET_IFNAME=enp1s0f1np1,enP2p1s0f1np1 \
+  -e NCCL_DEBUG=INFO \
+  -v /opt/llm/deep-ai/DeepSeek-V4-Flash-0731:/model \
+  lmsysorg/sglang:latest \
+  python3 -m sglang.launch_server \
+    --model-path /model \
+    --tp-size 2 \
+    --nnodes 2 \
+    --node-rank 1 \
+    --dist-init-addr 10.100.72.2:5000
