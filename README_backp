@@ -31,3 +31,8 @@ docker run --rm -it \
     --nnodes 2 \
     --node-rank 1 \
     --dist-init-addr 10.100.72.2:5000
+
+git clone https://github.com/MiaAI-Lab/Qwen3.8-Flash-Next-Dual-DGX-Sparks.git
+cd Qwen3.8-Flash-Next-Dual-DGX-Sparks
+cp .env.example .env
+./start.sh serve
