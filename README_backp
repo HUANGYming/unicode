@@ -36,3 +36,13 @@ git clone https://github.com/MiaAI-Lab/Qwen3.8-Flash-Next-Dual-DGX-Sparks.git
 cd Qwen3.8-Flash-Next-Dual-DGX-Sparks
 cp .env.example .env
 ./start.sh serve
+
+sudo mkdir -p /opt/llm/hf-cache/hub/models--RadixArk--Qwen3.8-Flash-Next-NVFP4/snapshots/local
+
+sudo cp -al /opt/llm/Qwen/Qwen3.8-Flash-Next-NVFP4/. \
+  /opt/llm/hf-cache/hub/models--RadixArk--Qwen3.8-Flash-Next-NVFP4/snapshots/local/
+
+HF_HOME=/opt/llm/hf-cache
+HF_REVISION=local
+WORKER_HF_HOME=/opt/llm/hf-cache
+DOWNLOAD_MODE=rsync
